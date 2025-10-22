@@ -116,28 +116,6 @@ poetry export -f requirements.txt --output requirements.txt
 
 **Quando usar:** Para compatibilidade com projetos que ainda usam pip/requirements.txt
 
-## Gerenciamento Automático de Ambiente Virtual
-
-O Poetry **cria automaticamente** um ambiente virtual isolado para cada projeto:
-
-### Ver onde estão as bibliotecas:
-
-```powershell
-poetry env info
-```
-
-**Saída exemplo:**
-
-```
-Path: C:\Users\SeuUsuario\AppData\Local\pypoetry\Cache\virtualenvs\poetry-poc-ABC123-py3.13
-```
-
-### Estrutura do ambiente virtual:
-
--   **Bibliotecas:** `...\virtualenvs\poetry-poc-ABC123-py3.13\Lib\site-packages\`
--   **Python:** `...\virtualenvs\poetry-poc-ABC123-py3.13\Scripts\python.exe`
--   **Isolamento:** Cada projeto tem suas próprias bibliotecas
-
 ### Vantagens do ambiente automático:
 
 -   ✅ **Zero configuração:** Não precisa criar/ativar venv manualmente
