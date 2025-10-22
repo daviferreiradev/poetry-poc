@@ -1,90 +1,197 @@
-# Exemplo prático: Usando o Poetry
+# Poetry POC - Demonstração Prática
 
-Este projeto mostra como usar o Poetry para instalar bibliotecas, rodar scripts, criar pacotes e usar plugins no Python.
+Demonstração completa do Poetry: gerenciamento de dependências, ambientes virtuais e build de pacotes Python.
 
-## Estrutura dos arquivos
+## Pré-requisitos
 
-| Arquivo/Pasta      | Função                                                       |
-| ------------------ | ------------------------------------------------------------ |
-| Arquivo/Pasta      | Função                                                       |
-| ------------------ | ------------------------------------------------------------ |
-| `pyproject.toml`   | Configuração do projeto, dependências e ponto de entrada     |
-| `poetry_poc/`      | Pacote principal do projeto                                   |
-| └─ `__init__.py`   | Identifica a pasta como pacote Python                        |
-| └─ `__main__.py`   | Código principal: faz requisição HTTP e imprime resultado     |
-| `dist/`            | Artefatos gerados pelo build (`.whl` e `.tar.gz`)           |
-| `requirements.txt` | Lista de dependências exportada pelo plugin (opcional)       |
-| `README.md`        | Este guia rápido                                            |
-
-## 1. Instalar o Poetry
-
-Instala o gerenciador de dependências Poetry no seu computador.
+### Instalar o Poetry
 
 ```powershell
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
 
-Depois feche e abra o terminal de novo para garantir que o comando `poetry` funcione.
-Para conferir se instalou:
+-   **Reinicie o computador** após a instalação
+
+## Estrutura do Projeto
+
+| Arquivo/Pasta    | Função                                                   |
+| ---------------- | -------------------------------------------------------- |
+| `main.py`        | Código principal da aplicação                            |
+| `pyproject.toml` | Configuração do projeto e dependências                   |
+| `poetry.lock`    | Versões exatas das dependências (gerado automaticamente) |
+| `dist/`          | Artefatos de build (.whl e .tar.gz)                      |
+
+## Passo a Passo da Demonstração
+
+### 1. Verificar Poetry Instalado
 
 ```powershell
 poetry --version
 ```
 
-Esse comando mostra a versão instalada do Poetry.
+**O que faz:** Confirma se o Poetry está instalado e funcionando.
 
-## 2. Adicionar uma biblioteca
+### 2. Criar Projeto do Zero
 
-Instala a biblioteca `requests` só para este projeto, sem afetar outros projetos Python.
+```powershell
+poetry init
+```
+
+**O que faz:** Cria o `pyproject.toml` através de perguntas interativas.
+
+### 3. Adicionar Dependências
 
 ```powershell
 poetry add requests
 ```
 
-O Poetry baixa e instala a biblioteca, além de atualizar o arquivo de dependências do projeto.
+**O que faz:**
 
-## 3. Rodar o script usando o Poetry
+-   Instala a biblioteca `requests`
+-   Cria ambiente virtual automaticamente
+-   Atualiza `pyproject.toml` com a dependência
+-   Gera `poetry.lock` com versões exatas
 
-O código principal está em `poetry_poc/__main__.py` e usa a biblioteca `requests`:
-
-```python
-import requests
-print("Poetry está funcionando!", requests.get("https://google.com", timeout=5).status_code)
-```
-
-Para rodar o projeto dentro do ambiente virtual do Poetry:
+### 4. Testar Execução
 
 ```powershell
-poetry run poetry-poc
+poetry run python main.py
 ```
 
-Esse comando executa o ponto de entrada do projeto, usando todas as dependências instaladas pelo Poetry, sem precisar ativar o ambiente virtual manualmente.
+**O que faz:** Executa o script dentro do ambiente virtual do Poetry.
+**Resultado esperado:** Demonstração completa com APIs de CEP e cotação
 
-## 4. Gerar o pacote do projeto
+### 5. Configurar Build (Manual)
 
-Cria os arquivos de distribuição para instalar o projeto em outros ambientes.
+Adicione ao final do `pyproject.toml`:
+
+```toml
+[tool.poetry]
+packages = [
+    { include = "*.py" }
+]
+```
+
+**Por que necessário:** Poetry precisa saber quais arquivos incluir no pacote quando o código está na raiz.
+
+### 6. Fazer Build
 
 ```powershell
 poetry build
 ```
 
-Esse comando gera a pasta `dist/` com dois arquivos:
+**O que faz:** Gera pacotes para distribuição (wheel e sdist).
 
--   `.whl` (pacote Wheel, usado para instalação rápida)
--   `.tar.gz` (pacote fonte)
-    Esses arquivos podem ser enviados para outros desenvolvedores ou publicados em repositórios.
+## Comandos Úteis para Trabalho em Equipe
 
-## 5. (Opcional) Exportar um requirements.txt
-
-Gera um arquivo `requirements.txt` com todas as dependências do projeto, útil para quem prefere instalar com pip.
+### Instalar dependências de um projeto existente:
 
 ```powershell
+poetry install
+```
+
+**Quando usar:** Após clonar um repositório com `pyproject.toml` e `poetry.lock`
+
+### Verificar o que está instalado:
+
+```powershell
+poetry show
+```
+
+### Ver localização do ambiente virtual:
+
+```powershell
+poetry env info
+```
+
+### Exportar para requirements.txt (para compatibilidade):
+
+```powershell
+# Instalar o plugin de export
 poetry self add poetry-plugin-export
+
+# Exportar dependências para requirements.txt
 poetry export -f requirements.txt --output requirements.txt
 ```
 
-Assim, você pode compartilhar as dependências do projeto com quem não usa Poetry.
+**Quando usar:** Para compatibilidade com projetos que ainda usam pip/requirements.txt
 
----
+## Gerenciamento Automático de Ambiente Virtual
 
-Resumo: O Poetry facilita instalar bibliotecas, rodar scripts, empacotar projetos e ainda pode ser estendido com plugins. Cada comando acima tem uma função específica para deixar o trabalho com Python mais organizado e prático.
+O Poetry **cria automaticamente** um ambiente virtual isolado para cada projeto:
+
+### Ver onde estão as bibliotecas:
+
+```powershell
+poetry env info
+```
+
+**Saída exemplo:**
+
+```
+Path: C:\Users\SeuUsuario\AppData\Local\pypoetry\Cache\virtualenvs\poetry-poc-ABC123-py3.13
+```
+
+### Estrutura do ambiente virtual:
+
+-   **Bibliotecas:** `...\virtualenvs\poetry-poc-ABC123-py3.13\Lib\site-packages\`
+-   **Python:** `...\virtualenvs\poetry-poc-ABC123-py3.13\Scripts\python.exe`
+-   **Isolamento:** Cada projeto tem suas próprias bibliotecas
+
+### Vantagens do ambiente automático:
+
+-   ✅ **Zero configuração:** Não precisa criar/ativar venv manualmente
+-   ✅ **Isolamento total:** Cada projeto independente
+-   ✅ **Limpeza:** Não polui o Python global
+
+## Extensibilidade e Plugins
+
+O Poetry permite personalização através de plugins e scripts:
+
+### Plugin de Export (Compatibilidade)
+
+```powershell
+# Instalar plugin
+poetry self add poetry-plugin-export
+
+# Gerar requirements.txt
+poetry export -f requirements.txt --output requirements.txt
+```
+
+**Por que usar:** Compatibilidade com ferramentas que ainda dependem de `requirements.txt`
+
+## Principais Vantagens do Poetry
+
+1. **Gerenciamento Unificado**: Um único arquivo (`pyproject.toml`) para dependências, metadados e configurações
+2. **Reprodutibilidade**: `poetry.lock` garante que todos usem exatamente as mesmas versões
+3. **Ambientes Automáticos**: Cria e gerencia ambientes virtuais sem comandos extras
+
+## Principais Desvantagens do Poetry
+
+1. **Curva de Aprendizado**: Desenvolvedores precisam aprender novos comandos (`poetry add` vs `pip install`)
+2. **Configuração Manual**: Projetos com estrutura não padrão requerem configuração extra (como visto no passo 5)
+
+## Explicação dos Arquivos Gerados
+
+### `pyproject.toml`
+
+-   **Metadados**: nome, versão, autor do projeto
+-   **Dependências**: bibliotecas necessárias com versões
+-   **Build**: configuração para geração de pacotes
+
+### `poetry.lock`
+
+-   **Versões exatas**: todas as dependências com versões específicas
+-   **Reprodutibilidade**: garante mesmo ambiente em qualquer máquina
+-   **Dependências transitivas**: inclui dependências das dependências
+-   **IMPORTANTE**: Sempre commitar no Git (NÃO vai no .gitignore)
+
+### `dist/poetry_poc-0.1.0-py3-none-any.whl`
+
+-   **Wheel**: pacote compilado para instalação rápida
+-   **Conteúdo**: código + metadados prontos para distribuição
+
+### `dist/poetry_poc-0.1.0.tar.gz`
+
+-   **Source Distribution**: código fonte compactado
+-   **Uso**: para quando wheel não está disponível
